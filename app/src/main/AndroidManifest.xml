@@ -16,6 +16,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".ResultActivity"></activity>
+
         <provider
             android:name="android.support.v4.content.FileProvider"
             android:authorities="com.bytedance.camera.demo"
@@ -45,9 +47,9 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".CustomCameraActivity"
-            android:screenOrientation="portrait"
             android:label="@string/title_activity_custom_camera"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

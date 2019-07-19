@@ -3,15 +3,21 @@ package com.bytedance.camera.demo;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.VideoView;
 
 public class RecordVideoActivity extends AppCompatActivity {
 
     private VideoView videoView;
+    private int flag = 0;
     private static final int REQUEST_VIDEO_CAPTURE = 1;
 
     private static final int REQUEST_EXTERNAL_CAMERA = 101;
@@ -26,8 +32,14 @@ public class RecordVideoActivity extends AppCompatActivity {
             if (ContextCompat.checkSelfPermission(RecordVideoActivity.this,
                     Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 //todo 在这里申请相机、存储的权限
+                ActivityCompat.requestPermissions(RecordVideoActivity.this,new String[]{Manifest.permission.CAMERA,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE},REQUEST_VIDEO_CAPTURE);
             } else {
                 //todo 打开相机拍摄
+                Intent takeVideoIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                if(takeVideoIntent.resolveActivity(getPackageManager()) != null){
+                    startActivityForResult(takeVideoIntent, REQUEST_VIDEO_CAPTURE);
+                }
             }
         });
 
@@ -38,6 +50,27 @@ public class RecordVideoActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, intent);
         if (requestCode == REQUEST_VIDEO_CAPTURE && resultCode == RESULT_OK) {
             //todo 播放刚才录制的视频
+            Uri videoUri = intent.getData();
+            videoView.setVideoURI(videoUri);
+            videoView.start();
+            videoView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(flag == 0){
+                        videoView.pause();
+                        flag = 1;
+                    } else if(flag == 1){
+                        videoView.start();
+                        flag = 0;
+                    }
+                }
+            });
+            videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                @Override
+                public void onCompletion(MediaPlayer mp) {
+                    videoView.start();
+                }
+            });
         }
     }
 
